@@ -4,11 +4,12 @@ from io import StringIO
 import time
 import requests
 import json
+import math
 
 
 with sync_playwright() as p:
     
-    browser = p.chromium.launch(headless=True)
+    browser = p.chromium.launch(headless=False)
     page = browser.new_page()
     
      # ข้อมูลหน้า มูลค่าซื้อขายตามกลุ่มนักลงทุน
@@ -90,26 +91,64 @@ with sync_playwright() as p:
     
 
     
-    data_to_send = {
-    "SET_data": set_data_list[0].to_dict(),
-    "mai_data": mai_data_list[0].to_dict(),
-    "overview_data": overview_data_list[0].to_dict(),
-    "short_sell_data": shortsell_data_list[0].to_dict() if 'shortsell_data_list' in locals() else None,
-    "program_trading_data": programTrade_data_list[0].to_dict(),
-    "security_data": security_data_list[0].to_dict() if 'security_data_list' in locals() else None,
+def convert_tuple_to_string(data):
+    if isinstance(data, list):
+        return [convert_tuple_to_string(item) for item in data]
+    elif isinstance(data, dict):
+        return {str(key): convert_tuple_to_string(value) for key, value in data.items()}
+    else:
+        return data
+
+def clean_nan_values(obj):
+    if isinstance(obj, list):
+        return [clean_nan_values(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: clean_nan_values(value) for key, value in obj.items()}
+    elif isinstance(obj, float):
+        if math.isnan(obj) or obj == float('inf') or obj == float('-inf'):
+            return None
+    return obj
+
+# สร้าง data_to_send
+data_to_send = {
+    "SET_data": set_data_list[0].to_dict(orient='records') if set_data_list else None,
+    "mai_data": mai_data_list[0].to_dict(orient='records') if mai_data_list else None,
+    "overview_data": overview_data_list[0].to_dict(orient='records') if overview_data_list else None,
+    "short_sell_data": shortsell_data_list[0].to_dict(orient='records') if 'shortsell_data_list' in locals() else None,
+    "program_trading_data": programTrade_data_list[0].to_dict(orient='records') if programTrade_data_list else None,
+    "security_data": security_data_list[0].to_dict(orient='records') if 'security_data_list' in locals() else None,
 }
 
-url = 'https://projectsrapingset.onrender.com/api/data'
+# แปลง tuple ภายในข้อมูลให้เป็น string ทั้งหมด
+clean_data_to_send = {key: convert_tuple_to_string(value) for key, value in data_to_send.items()}
+
+# ทำความสะอาดข้อมูลที่เป็น NaN และ Infinity
+clean_data_to_send = clean_nan_values(clean_data_to_send)
+
+# พิมพ์โครงสร้างข้อมูล
+print("Data to send structure:")
+for key, value in clean_data_to_send.items():
+    print(f"{key}: {type(value)}")  # แสดงประเภทของข้อมูล
+
+# พิมพ์ข้อมูลที่จะส่ง
+print("Data to send:")
+print(clean_data_to_send)
+
+# ลองแปลงเป็น JSON
+try:
+    json_data = json.dumps(clean_data_to_send, ensure_ascii=False)
+    print("JSON data to send:")
+    print(json_data)
+except Exception as e:
+    print("Error converting to JSON:", e)
 
 # ส่งข้อมูลด้วย POST request
-response = requests.post(url, json=data_to_send)
+url = 'https://projectsrapingset.onrender.com/api/data'
+
+response = requests.post(url, json=clean_data_to_send)
 
 # ตรวจสอบผลลัพธ์ที่ได้รับจากเซิร์ฟเวอร์
 if response.status_code == 200:
     print("ส่งข้อมูลสำเร็จ:", response.json())
 else:
     print("ส่งข้อมูลไม่สำเร็จ:", response.status_code, response.text)
-    
-
-    
-    
