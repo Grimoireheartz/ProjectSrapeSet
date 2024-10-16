@@ -99,7 +99,7 @@ with sync_playwright() as p:
     "security_data": security_data_list[0].to_dict() if 'security_data_list' in locals() else None,
 }
 
-url = 'https://projectsrapingset.onrender.com'
+url = 'https://projectsrapingset.onrender.com/api/data'
 
 # ส่งข้อมูลด้วย POST request
 response = requests.post(url, json=data_to_send)
