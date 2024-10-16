@@ -2,6 +2,8 @@ from playwright.sync_api import sync_playwright
 import pandas as pd
 from io import StringIO
 import time
+import requests
+import json
 
 
 with sync_playwright() as p:
@@ -88,5 +90,26 @@ with sync_playwright() as p:
     
 
     
+    data_to_send = {
+    "SET_data": set_data_list[0].to_dict(),
+    "mai_data": mai_data_list[0].to_dict(),
+    "overview_data": overview_data_list[0].to_dict(),
+    "short_sell_data": shortsell_data_list[0].to_dict() if 'shortsell_data_list' in locals() else None,
+    "program_trading_data": programTrade_data_list[0].to_dict(),
+    "security_data": security_data_list[0].to_dict() if 'security_data_list' in locals() else None,
+}
+
+url = 'https://projectsrapingset.onrender.com'
+
+# ส่งข้อมูลด้วย POST request
+response = requests.post(url, json=data_to_send)
+
+# ตรวจสอบผลลัพธ์ที่ได้รับจากเซิร์ฟเวอร์
+if response.status_code == 200:
+    print("ส่งข้อมูลสำเร็จ:", response.json())
+else:
+    print("ส่งข้อมูลไม่สำเร็จ:", response.status_code, response.text)
+    
+
     
     
