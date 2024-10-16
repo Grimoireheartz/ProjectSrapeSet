@@ -8,7 +8,7 @@ import json
 
 with sync_playwright() as p:
     
-    browser = p.chromium.launch(headless=False)
+    browser = p.chromium.launch(headless=True)
     page = browser.new_page()
     
      # ข้อมูลหน้า มูลค่าซื้อขายตามกลุ่มนักลงทุน
