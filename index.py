@@ -152,4 +152,4 @@ response = requests.post(url, json=clean_data_to_send)
 if response.status_code == 200:
     print("ส่งข้อมูลสำเร็จ:", response.json())
 else:
-    print("ส่งข้อมูลไม่สำเร็จ:", response.status_code, response.text)
+    print(f"ส่งข้อมูลล้มเหลว รหัสสถานะ: {response.status_code}, การตอบกลับ: {response.text}")
