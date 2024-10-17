@@ -143,7 +143,7 @@ except Exception as e:
     print("Error converting to JSON:", e)
 
 # ส่งข้อมูลด้วย POST request
-url = 'https://projectsrapingset.onrender.com/api/data'
+url = 'https://projectscrapingset.onrender.com/api/data'
 
 response = requests.post(url, json=clean_data_to_send)
 
