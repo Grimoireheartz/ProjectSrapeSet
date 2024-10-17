@@ -1,26 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
 const App = () => {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // ตัวอย่างข้อมูลสำหรับทดสอบ
+  const [data, setData] = useState({
+    SET_data: [{ name: "Test SET Data" }],
+    mai_data: [{ name: "Test mai Data" }],
+    overview_data: [{ name: "Test Overview Data" }],
+    short_sell_data: [{ name: "Test Short Sell Data" }],
+    program_trading_data: [{ name: "Test Program Trading Data" }],
+    security_data: [{ name: "Test Security Data" }]
+  });
+
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    // API URL จาก Render.com
-    const apiUrl = 'https://projectsrapingset.onrender.com/api/data';
-
-    axios.get(apiUrl)
-      .then(response => {
-        setData(response.data);
-        setLoading(false);
-      })
-      .catch(error => {
-        setError('Error fetching the API');
-        setLoading(false);
-        console.error('Error fetching the API:', error);
-      });
-  }, []);
 
   if (loading) {
     return <p>Loading data...</p>;
