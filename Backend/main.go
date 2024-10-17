@@ -5,11 +5,20 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gin-contrib/cors" // Import CORS
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	r := gin.Default()
+
+	// เพิ่ม CORS middleware
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000", "https://your-production-domain.com"}, // อนุญาต frontend ทั้ง localhost และ production
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders:     []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
 	// GET route
 	r.GET("/api/data", func(c *gin.Context) {
@@ -20,19 +29,15 @@ func main() {
 	r.POST("/api/data", func(c *gin.Context) {
 		var jsonData map[string]interface{}
 
-		// Bind ข้อมูล JSON ไปยัง map
 		if err := c.ShouldBindJSON(&jsonData); err != nil {
 			log.Println("Error binding JSON:", err)
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		// แสดงข้อมูลที่รับมาใน log
 		fmt.Println("ข้อมูลที่ได้รับจาก Python:", jsonData)
-
 		log.Printf("Received data: %v\n", jsonData)
 
-		// ส่งกลับข้อมูลที่ได้รับไปยัง Python
 		c.JSON(http.StatusOK, gin.H{"received_data": jsonData})
 	})
 
