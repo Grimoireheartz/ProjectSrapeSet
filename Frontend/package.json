@@ -2,7 +2,7 @@
   "name": "frontend",
   "version": "1.0.0",
   "main": "index.js",
-  "homepage": "https://Grimoireheartz.github.io/ProjectScrapeSet",
+  "homepage": "https://Grimoireheartz.github.io/ProjectSrapeSet",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
